@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+/**
+ * 테더식당 — 모바일 퍼스트, USDT(테더) 톤의 다크 그린 UI.
+ * 실결제/온체인 연동 없음: 홀딩·정산은 mock 어댑터로만 시뮬레이션.
+ */
+@theme {
+  --font-sans: 'Pretendard Variable', Pretendard, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-tr-bg: #0a100e;
+  --color-tr-surface: #0f1814;
+  --color-tr-surface-2: #14221c;
+  --color-tr-border: #1e2f28;
+  --color-tr-border-2: #2a4036;
+  --color-tr-text: #e8f2ec;
+  --color-tr-muted: #7d9a8c;
+  --color-tr-accent: #26a17b;
+  --color-tr-accent-dim: #1b7a5c;
+  --color-tr-warn: #f59e0b;
+  --color-tr-danger: #ef4444;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(55% 38% at 12% 0%, rgba(38, 161, 123, 0.12) 0%, transparent 58%),
+    radial-gradient(45% 32% at 100% 8%, rgba(27, 122, 92, 0.08) 0%, transparent 55%),
+    var(--color-tr-bg);
+  color: var(--color-tr-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-tr-border-2);
+  border-radius: 999px;
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
