@@ -7,9 +7,12 @@ import { CartPage } from './pages/customer/CartPage'
 import { CheckoutPage } from './pages/customer/CheckoutPage'
 import { CustomerHomePage } from './pages/customer/CustomerHomePage'
 import { MenuListPage } from './pages/customer/MenuListPage'
+import { MyProfilePage } from './pages/customer/MyProfilePage'
+import { OrderHistoryPage } from './pages/customer/OrderHistoryPage'
 import { OrderStatusPage } from './pages/customer/OrderStatusPage'
 import { PaymentHoldPage } from './pages/customer/PaymentHoldPage'
 import { SearchPage } from './pages/customer/SearchPage'
+import { QrStoreEntryPage, ShortStoreEntryPage } from './pages/customer/StoreEntryRedirectPage'
 import { StoreDetailPage } from './pages/customer/StoreDetailPage'
 import {
   HqCampaignsPage,
@@ -37,6 +40,9 @@ export default function App() {
   return (
     <div className="h-full min-h-0 bg-[var(--color-tr-bg)] text-[var(--color-tr-text)]">
       <Routes>
+        <Route path="/s/:storeId" element={<ShortStoreEntryPage />} />
+        <Route path="/qr/:storeId" element={<QrStoreEntryPage />} />
+
         <Route path="/" element={<CustomerLayout />}>
           <Route index element={<CustomerHomePage />} />
           <Route path="search" element={<SearchPage />} />
@@ -45,7 +51,9 @@ export default function App() {
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="pay/:draftId" element={<PaymentHoldPage />} />
+          <Route path="orders" element={<OrderHistoryPage />} />
           <Route path="orders/:orderId" element={<OrderStatusPage />} />
+          <Route path="me" element={<MyProfilePage />} />
         </Route>
 
         <Route path="/admin/store" element={<StoreAdminLayout />}>

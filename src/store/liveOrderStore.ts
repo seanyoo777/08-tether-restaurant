@@ -1,15 +1,22 @@
 import { create } from 'zustand'
 
-import type { OrderStatus } from '../mock/orders'
+import type { OrderLineItem, OrderStatus } from '../mock/orders'
 
-/** 결제 완료 후 주문 상태 화면용 mock 세션 저장 */
+/** 결제 완료 후 주문 상세·주문내역용 mock 세션 저장 */
 export type LiveOrder = {
   id: string
+  storeId: string
   storeName: string
+  /** MockOrder.customerLabel 과 정합용 (없으면 스냅샷 customerName 은 null) */
+  customerLabel?: string
   status: OrderStatus
   totalKrw: number
   totalUsdtHold: number
   holdingTxRef: string | null
+  createdAt: string
+  items: OrderLineItem[]
+  deliveryAddress: string
+  deliveryRequest: string
 }
 
 type LiveState = {

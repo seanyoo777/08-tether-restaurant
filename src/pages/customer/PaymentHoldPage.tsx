@@ -38,11 +38,22 @@ export function PaymentHoldPage() {
     const tx = `mock-hold-trx-${Math.random().toString(16).slice(2, 10)}`
     upsertLive({
       id: orderId,
+      storeId: draft.storeId,
       storeName: draft.storeName,
       status: 'paid_holding',
       totalKrw: draft.totalKrw,
       totalUsdtHold: draft.totalUsdt,
       holdingTxRef: tx,
+      createdAt: new Date().toISOString(),
+      items: draft.lines.map((l) => ({
+        menuId: l.menuId,
+        name: l.name,
+        qty: l.qty,
+        lineTotalKrw: l.lineTotalKrw,
+        options: [],
+      })),
+      deliveryAddress: '서울시 강남구 테헤란로 123 (mock)',
+      deliveryRequest: '문 앞에 놓아주세요 (mock)',
     })
     removeDraft(draftId)
     clearCart()

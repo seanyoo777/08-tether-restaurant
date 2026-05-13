@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Card } from '../../components/Card'
@@ -5,7 +6,7 @@ import { MockBanner } from '../../components/MockBanner'
 import { PageHeader } from '../../components/PageHeader'
 import { TrButton } from '../../components/TrButton'
 import { DEFAULT_ACTIVE_RAIL, type PaymentRail } from '../../integration/productContext'
-import { useCartStore } from '../../store/cartStore'
+import { computeCartTotals, useCartStore } from '../../store/cartStore'
 import { useCheckoutDraftStore } from '../../store/checkoutDraftStore'
 
 const futureRails: { id: PaymentRail; label: string; disabled: boolean }[] = [
@@ -21,7 +22,7 @@ export function CheckoutPage() {
   const lines = useCartStore((s) => s.lines)
   const storeId = useCartStore((s) => s.storeId)
   const storeName = useCartStore((s) => s.storeName)
-  const totals = useCartStore((s) => s.totals())
+  const totals = useMemo(() => computeCartTotals(lines), [lines])
   const putDraft = useCheckoutDraftStore((s) => s.put)
 
   const disabled = !storeId || !storeName || lines.length === 0

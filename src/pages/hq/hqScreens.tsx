@@ -1,5 +1,10 @@
+import { useMemo } from 'react'
+
 import { Card } from '../../components/Card'
 import { MockBanner } from '../../components/MockBanner'
+import { mergeMockAndLiveOrderSnapshots } from '../../domain/orderSnapshot'
+import { mockOrders, orderStatusLabel } from '../../mock/orders'
+import { useLiveOrderStore } from '../../store/liveOrderStore'
 
 function HqStub({ title, description, rows }: { title: string; description: string; rows: { k: string; v: string }[] }) {
   return (
@@ -81,16 +86,73 @@ export function HqMenusPage() {
   )
 }
 
+function inFlightOrderCount(snapshots: ReturnType<typeof mergeMockAndLiveOrderSnapshots>): number {
+  return snapshots.filter((s) => s.orderStatus !== 'delivered' && s.orderStatus !== 'cancelled').length
+}
+
 export function HqOrdersPage() {
+  const liveMap = useLiveOrderStore((s) => s.orders)
+  const snapshots = useMemo(() => mergeMockAndLiveOrderSnapshots(mockOrders, liveMap), [liveMap])
+  const inFlight = useMemo(() => inFlightOrderCount(snapshots), [snapshots])
+
   return (
-    <HqStub
-      title="주문 관리"
-      description="전 가맹 주문 타임라인, 강제 취소, 재배차 지시."
-      rows={[
-        { k: '진행 중', v: '512' },
-        { k: '지연 경보', v: '9' },
-      ]}
-    />
+    <div className="flex max-w-3xl flex-col gap-4">
+      <MockBanner />
+      <div>
+        <h2 className="text-lg font-bold">주문 관리</h2>
+        <p className="mt-1 text-sm text-[var(--color-tr-muted)]">
+          전 가맹 주문 타임라인, 강제 취소, 재배차 지시. (mock — 고객·점주와 동일 OrderSnapshot 병합)
+        </p>
+      </div>
+      <Card>
+        <table className="w-full text-left text-sm">
+          <tbody>
+            <tr className="border-b border-[var(--color-tr-border)]">
+              <th className="py-2 pr-3 font-normal text-[var(--color-tr-muted)]">진행 중</th>
+              <td className="py-2 tabular-nums text-[var(--color-tr-text)]">{inFlight}</td>
+            </tr>
+            <tr>
+              <th className="py-2 pr-3 font-normal text-[var(--color-tr-muted)]">지연 경보</th>
+              <td className="py-2 tabular-nums text-[var(--color-tr-text)]">9</td>
+            </tr>
+          </tbody>
+        </table>
+      </Card>
+      <div className="flex flex-col gap-3">
+        {snapshots.map((s) => (
+          <Card key={s.id}>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="font-mono text-[11px] text-[var(--color-tr-muted)]">{s.id}</p>
+                <p className="mt-0.5 text-sm font-semibold">{s.storeName}</p>
+                <p className="mt-1 text-xs text-[var(--color-tr-muted)]">
+                  고객 <span className="text-[var(--color-tr-text)]">{s.customerName ?? '—'}</span>
+                </p>
+                <p className="mt-1 text-sm font-medium">{orderStatusLabel[s.orderStatus]}</p>
+                <p className="mt-1 line-clamp-2 text-[11px] text-[var(--color-tr-muted)]">{s.address}</p>
+                {s.memo ? (
+                  <p className="mt-0.5 line-clamp-2 text-[11px] text-[var(--color-tr-muted)]">요청: {s.memo}</p>
+                ) : null}
+                <ul className="mt-2 space-y-0.5 text-[11px] text-[var(--color-tr-muted)]">
+                  {s.items.map((i) => (
+                    <li key={i.menuId}>
+                      {i.name} × {i.qty}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="shrink-0 text-left sm:text-right">
+                <p className="text-sm font-semibold tabular-nums">{s.totalAmount.toLocaleString()}원</p>
+                <p className="text-[11px] text-[var(--color-tr-muted)] tabular-nums">₮ {s.totalUsdtHold}</p>
+                <p className="mt-1 text-[10px] text-[var(--color-tr-muted)]">
+                  {new Date(s.createdAt).toLocaleString('ko-KR')}
+                </p>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
   )
 }
 

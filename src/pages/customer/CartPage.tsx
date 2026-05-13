@@ -1,10 +1,11 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Card } from '../../components/Card'
 import { MockBanner } from '../../components/MockBanner'
 import { PageHeader } from '../../components/PageHeader'
 import { TrButton } from '../../components/TrButton'
-import { useCartStore } from '../../store/cartStore'
+import { computeCartTotals, useCartStore } from '../../store/cartStore'
 
 export function CartPage() {
   const navigate = useNavigate()
@@ -12,8 +13,7 @@ export function CartPage() {
   const storeName = useCartStore((s) => s.storeName)
   const setQty = useCartStore((s) => s.setQty)
   const clear = useCartStore((s) => s.clear)
-  const totals = useCartStore((s) => s.totals())
-  const t = totals
+  const t = useMemo(() => computeCartTotals(lines), [lines])
 
   return (
     <div>

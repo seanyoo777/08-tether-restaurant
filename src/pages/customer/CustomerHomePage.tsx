@@ -45,9 +45,6 @@ export function CustomerHomePage() {
           </Link>
         ))}
       </div>
-      <Link to="/admin/hq" className="text-center text-xs text-[var(--color-tr-muted)] underline-offset-2 hover:underline">
-        본사 관리자 (데모)
-      </Link>
     </div>
   )
 }
