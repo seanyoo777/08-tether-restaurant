@@ -2,9 +2,12 @@ import { Link } from 'react-router-dom'
 
 import { Card } from '../../components/Card'
 import { MockBanner } from '../../components/MockBanner'
+import { OneAiLogo } from '../../components/coupon/OneAiLogo'
 import { mockStores } from '../../mock/catalog'
+import { useFeatureFlagsStore } from '../../store/featureFlagsStore'
 
 export function CustomerHomePage() {
+  const qrCoupon = useFeatureFlagsStore((s) => s.flags.qrCouponEnabled)
   return (
     <div className="flex flex-col gap-4 p-4 pb-8">
       <div>
@@ -13,6 +16,18 @@ export function CustomerHomePage() {
         <p className="mt-1 text-sm text-[var(--color-tr-muted)]">휴대폰으로 주문·USDT 홀딩까지 한 화면에서 (mock)</p>
       </div>
       <MockBanner />
+      {qrCoupon ? (
+        <Link
+          to="/coupons"
+          className="block rounded-2xl border border-[var(--color-tr-accent)]/30 bg-gradient-to-r from-[var(--color-tr-surface-2)] to-[var(--color-tr-surface)] p-4"
+        >
+          <p className="text-xs font-medium text-[var(--color-tr-accent)]">QR 쿠폰 · 이벤트</p>
+          <p className="mt-1 text-sm font-semibold">내 쿠폰 지갑 열기 (mock)</p>
+          <span className="mt-2 inline-block">
+            <OneAiLogo compact />
+          </span>
+        </Link>
+      ) : null}
       <div className="grid gap-3">
         {mockStores.map((s) => (
           <Link key={s.id} to={`/stores/${s.id}`} className="block">

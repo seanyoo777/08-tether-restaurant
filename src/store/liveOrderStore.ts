@@ -23,10 +23,17 @@ type LiveState = {
   orders: Record<string, LiveOrder>
   upsert: (o: LiveOrder) => void
   get: (id: string) => LiveOrder | undefined
+  /** mock 세션 주문만 — 시드 mockOrders 는 변경하지 않음 */
+  updateStatus: (id: string, status: OrderStatus) => void
 }
 
 export const useLiveOrderStore = create<LiveState>((set, get) => ({
   orders: {},
   upsert: (o) => set({ orders: { ...get().orders, [o.id]: o } }),
   get: (id) => get().orders[id],
+  updateStatus: (id, status) => {
+    const cur = get().orders[id]
+    if (!cur) return
+    set({ orders: { ...get().orders, [id]: { ...cur, status } } })
+  },
 }))

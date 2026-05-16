@@ -7,6 +7,7 @@ const links = [
   { to: '/admin/store/menus', label: '메뉴 관리' },
   { to: '/admin/store/orders', label: '주문 접수' },
   { to: '/admin/store/settlement', label: '정산 관리' },
+  { to: '/admin/hq/self-test', label: 'Self-Test' },
 ]
 
 export function StoreAdminLayout() {

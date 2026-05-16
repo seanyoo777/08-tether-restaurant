@@ -15,5 +15,8 @@
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 디렉터리 구조, 레이아웃, 상태·도메인 모듈 |
 | [ROUTES.md](./ROUTES.md) | 라우팅 표 (고객 / 관리자 / 딥링크) |
 | [TETHER_RESTAURANT_STRUCTURE_AUDIT.md](./TETHER_RESTAURANT_STRUCTURE_AUDIT.md) | 8번 전용 구조 점검(폴더·라우트·위험도·공통/전용 분리) |
+| [SELF_TEST.md](./SELF_TEST.md) | Self-Test Center, diagnostics, audit trail, flags, smoke CLI |
+| [TETHER_RESTAURANT_COUPON.md](./TETHER_RESTAURANT_COUPON.md) | QR / event coupon mock, wallet UI, status, audit |
+| [TETHER_RESTAURANT_ONEAI_EVENT.md](./TETHER_RESTAURANT_ONEAI_EVENT.md) | OneAI Event Hub mock bridge, 당첨·발급 |
 
 프로젝트 루트 규칙 요약: [`AGENTS.md`](../AGENTS.md)

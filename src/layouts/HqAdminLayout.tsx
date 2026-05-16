@@ -18,6 +18,7 @@ const hqNav = [
   { to: '/admin/hq/notifications', label: '알림·푸시' },
   { to: '/admin/hq/stats', label: '통계' },
   { to: '/admin/hq/rbac', label: '권한(RBAC)' },
+  { to: '/admin/hq/self-test', label: 'Self-Test' },
 ] as const
 
 export function HqAdminLayout() {

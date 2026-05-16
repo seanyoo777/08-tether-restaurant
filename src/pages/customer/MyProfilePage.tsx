@@ -1,8 +1,12 @@
+import { Link } from 'react-router-dom'
+
 import { Card } from '../../components/Card'
 import { MockBanner } from '../../components/MockBanner'
 import { PageHeader } from '../../components/PageHeader'
+import { useFeatureFlagsStore } from '../../store/featureFlagsStore'
 
 export function MyProfilePage() {
+  const qrCoupon = useFeatureFlagsStore((s) => s.flags.qrCouponEnabled)
   return (
     <div>
       <PageHeader title="내 정보" backTo="/" />
@@ -20,6 +24,14 @@ export function MyProfilePage() {
           <p className="text-xs text-[var(--color-tr-muted)]">앱</p>
           <p className="mt-1 text-sm">테더식당 고객 앱 · MVP</p>
         </Card>
+        {qrCoupon ? (
+          <Link
+            to="/coupons"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-[var(--color-tr-accent)]/40 bg-[var(--color-tr-accent)]/10 text-sm font-semibold text-[var(--color-tr-accent)]"
+          >
+            QR 쿠폰 지갑
+          </Link>
+        ) : null}
       </div>
     </div>
   )

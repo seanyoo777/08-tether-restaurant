@@ -35,6 +35,11 @@ import { StoreAdminHomePage } from './pages/store-admin/StoreAdminHomePage'
 import { StoreMenuManagePage } from './pages/store-admin/StoreMenuManagePage'
 import { StoreOrdersPage } from './pages/store-admin/StoreOrdersPage'
 import { StoreSettlementPage } from './pages/store-admin/StoreSettlementPage'
+import { SelfTestCenterPage } from './pages/admin/SelfTestCenterPage'
+import { CouponDetailPage } from './pages/customer/CouponDetailPage'
+import { CouponHelpPage } from './pages/customer/CouponHelpPage'
+import { CouponWalletPage } from './pages/customer/CouponWalletPage'
+import { OneAiEventHubPage } from './pages/customer/OneAiEventHubPage'
 
 export default function App() {
   return (
@@ -54,6 +59,10 @@ export default function App() {
           <Route path="orders" element={<OrderHistoryPage />} />
           <Route path="orders/:orderId" element={<OrderStatusPage />} />
           <Route path="me" element={<MyProfilePage />} />
+          <Route path="coupons" element={<CouponWalletPage />} />
+          <Route path="coupons/help" element={<CouponHelpPage />} />
+          <Route path="coupons/:couponId" element={<CouponDetailPage />} />
+          <Route path="events/oneai" element={<OneAiEventHubPage />} />
         </Route>
 
         <Route path="/admin/store" element={<StoreAdminLayout />}>
@@ -78,6 +87,7 @@ export default function App() {
           <Route path="notifications" element={<HqNotificationsPage />} />
           <Route path="stats" element={<HqStatsPage />} />
           <Route path="rbac" element={<HqRbacPage />} />
+          <Route path="self-test" element={<SelfTestCenterPage />} />
         </Route>
 
         <Route path="/rider" element={<RiderHomePage />} />

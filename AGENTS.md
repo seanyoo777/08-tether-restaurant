@@ -67,8 +67,12 @@ Current priorities:
 
 ## FUTURE EXPANSION
 
+Current mock systems (additive):
+- QR / Event coupon wallet (`/coupons`, OneAI Event Hub mock at `/events/oneai`)
+- Self-Test Center (`/admin/hq/self-test`)
+
 Planned future integrations:
-- OneAI bridge
+- OneAI bridge (Event Hub live API — mock adapter in `integration/oneaiEventHub.ts`)
 - Unified admin
 - Notification system
 - Push system

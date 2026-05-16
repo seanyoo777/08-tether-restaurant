@@ -5,10 +5,29 @@ import { MockBanner } from '../../components/MockBanner'
 import { TrButton } from '../../components/TrButton'
 import { mergeMockAndLiveOrderSnapshots } from '../../domain/orderSnapshot'
 import { mockOrders, orderStatusLabel } from '../../mock/orders'
+import { appendAdminActionAudit } from '../../store/auditTrailStore'
 import { useLiveOrderStore } from '../../store/liveOrderStore'
+import { validateAfterAdminAction } from '../../selfTest/runSelfTests'
 
 export function StoreOrdersPage() {
   const liveMap = useLiveOrderStore((s) => s.orders)
+  const updateStatus = useLiveOrderStore((s) => s.updateStatus)
+
+  const onAcceptMock = (orderId: string) => {
+    if (liveMap[orderId]) {
+      updateStatus(orderId, 'accepted')
+    }
+    appendAdminActionAudit({
+      actor: 'store_admin',
+      action: 'order.accept.mock',
+      target: orderId,
+    })
+    validateAfterAdminAction({
+      actor: 'store_admin',
+      action: 'order.accept.mock',
+      orderId,
+    })
+  }
 
   const rows = useMemo(() => mergeMockAndLiveOrderSnapshots(mockOrders, liveMap), [liveMap])
 
@@ -46,7 +65,9 @@ export function StoreOrdersPage() {
             <TrButton variant="ghost" className="flex-1 min-h-9 text-xs">
               거절
             </TrButton>
-            <TrButton className="flex-[2] min-h-9 text-xs">접수 (mock)</TrButton>
+            <TrButton className="flex-[2] min-h-9 text-xs" onClick={() => onAcceptMock(s.id)}>
+              접수 (mock)
+            </TrButton>
           </div>
         </Card>
       ))}
