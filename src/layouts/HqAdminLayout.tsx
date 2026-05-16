@@ -15,6 +15,7 @@ const hqNav = [
   { to: '/admin/hq/disputes', label: '분쟁·환불' },
   { to: '/admin/hq/reports', label: '신고·차단' },
   { to: '/admin/hq/campaigns', label: '쿠폰·이벤트' },
+  { to: '/admin/hq/coupon-ops', label: '쿠폰 운영' },
   { to: '/admin/hq/notifications', label: '알림·푸시' },
   { to: '/admin/hq/stats', label: '통계' },
   { to: '/admin/hq/rbac', label: '권한(RBAC)' },

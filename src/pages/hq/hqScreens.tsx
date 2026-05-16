@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 
 import { Card } from '../../components/Card'
 import { MockBanner } from '../../components/MockBanner'
@@ -224,14 +225,23 @@ export function HqReportsPage() {
 
 export function HqCampaignsPage() {
   return (
-    <HqStub
-      title="쿠폰·이벤트"
-      description="조건 쿠폰, 세그먼트 푸시, 가맹 공동 프로모션."
-      rows={[
-        { k: '진행 중 캠페인', v: '5' },
-        { k: '예산 소진율', v: '62%' },
-      ]}
-    />
+    <div className="flex max-w-3xl flex-col gap-4">
+      <MockBanner />
+      <Link
+        to="/admin/hq/coupon-ops"
+        className="block rounded-xl border border-[var(--color-tr-accent)]/30 bg-[var(--color-tr-accent)]/5 px-4 py-3 text-sm font-semibold text-[var(--color-tr-accent)]"
+      >
+        쿠폰 운영 관리 패널 (localStorage · audit · Self-Test) →
+      </Link>
+      <HqStub
+        title="쿠폰·이벤트"
+        description="조건 쿠폰, 세그먼트 푸시, 가맹 공동 프로모션."
+        rows={[
+          { k: '진행 중 캠페인', v: '5' },
+          { k: '예산 소진율', v: '62%' },
+        ]}
+      />
+    </div>
   )
 }
 

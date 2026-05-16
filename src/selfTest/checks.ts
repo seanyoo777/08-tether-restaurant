@@ -9,6 +9,9 @@ import {
   mockOrderToSnapshot,
 } from '../domain/orderSnapshot'
 import { runCouponChecks } from './couponChecks'
+import { runProfileChipChecks } from './profileChipChecks'
+import { runProfileChipDropdownChecks } from './profileChipDropdownChecks'
+import { runCommandPaletteChecks } from './commandPaletteChecks'
 import type { SelfTestCheck } from './types'
 
 function check(
@@ -225,5 +228,8 @@ export function runAllSelfTestChecks(): SelfTestCheck[] {
     ...runFeatureFlagChecks(),
     ...runRoutingSmokeChecks(),
     ...runCouponChecks(),
+    ...runProfileChipChecks(),
+    ...runProfileChipDropdownChecks(),
+    ...runCommandPaletteChecks(),
   ]
 }

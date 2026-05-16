@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom'
 
-import { couponStatusLabel, effectiveCouponStatus, type RestaurantCoupon } from '../../domain/coupon'
+import { displayCouponStatusLabel, effectiveOfflineCouponStatus, type RestaurantCoupon } from '../../domain/coupon'
 import { OneAiLogo } from './OneAiLogo'
 
 const statusTone: Record<string, string> = {
-  unused: 'border-[var(--color-tr-accent)]/40',
-  reserved: 'border-[var(--color-tr-warn)]/40',
-  redeemed: 'border-[var(--color-tr-border-2)] opacity-80',
+  issued: 'border-[var(--color-tr-accent)]/40',
+  used: 'border-[var(--color-tr-border-2)] opacity-80',
   expired: 'border-[var(--color-tr-border)] opacity-60',
+  canceled: 'border-[var(--color-tr-danger)]/30 opacity-70',
 }
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
 }
 
 export function CouponCard({ coupon, compact }: Props) {
-  const status = effectiveCouponStatus(coupon)
+  const status = effectiveOfflineCouponStatus(coupon)
   const until = new Date(coupon.validUntil).toLocaleString('ko-KR', {
     month: 'short',
     day: 'numeric',
@@ -48,7 +48,7 @@ export function CouponCard({ coupon, compact }: Props) {
         <p className="mt-1 text-[11px] text-[var(--color-tr-muted)]">사용 가능 ~ {until}</p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-[var(--color-tr-surface)] px-2 py-0.5 text-[10px] font-medium">
-            {couponStatusLabel[status]}
+            {displayCouponStatusLabel(coupon)}
           </span>
           {coupon.bjEventTag ? (
             <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[10px] text-violet-300">

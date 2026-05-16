@@ -18,5 +18,6 @@
 | [SELF_TEST.md](./SELF_TEST.md) | Self-Test Center, diagnostics, audit trail, flags, smoke CLI |
 | [TETHER_RESTAURANT_COUPON.md](./TETHER_RESTAURANT_COUPON.md) | QR / event coupon mock, wallet UI, status, audit |
 | [TETHER_RESTAURANT_ONEAI_EVENT.md](./TETHER_RESTAURANT_ONEAI_EVENT.md) | OneAI Event Hub mock bridge, 당첨·발급 |
+| [TETHER_RESTAURANT_COUPON_EVENT.md](./TETHER_RESTAURANT_COUPON_EVENT.md) | 오프라인 쿠폰·이벤트 MVP (issued/used/expired/canceled, localStorage) |
 
 프로젝트 루트 규칙 요약: [`AGENTS.md`](../AGENTS.md)

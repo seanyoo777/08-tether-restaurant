@@ -1,13 +1,25 @@
 import {
+  buildHqCouponOpsSnapshot,
+  buildCouponStatusCounts,
+} from '../domain/hqCouponOps'
+import {
   buildQrPlaceholderPayload,
-  canTransitionCoupon,
-  effectiveCouponStatus,
-  transitionCouponStatus,
+  canTransitionOffline,
+  effectiveOfflineCouponStatus,
+  migrateStoredCouponStatus,
+  transitionOfflineCouponStatus,
 } from '../domain/coupon'
 import { mockCoupons } from '../mock/coupons'
+import { mockEventCampaigns } from '../mock/eventCampaigns'
 import { useFeatureFlagsStore } from '../store/featureFlagsStore'
 import { useCouponWalletStore } from '../store/couponWalletStore'
+import {
+  getCouponWalletStorageKey,
+  loadPersistedCouponWallet,
+  savePersistedCouponWallet,
+} from '../store/couponWalletPersistence'
 import type { SelfTestCheck } from './types'
+import { runCouponRiskGuardChecks } from './couponRiskChecks'
 
 function check(
   partial: Omit<SelfTestCheck, 'durationMs'> & { durationMs?: number },
@@ -21,12 +33,13 @@ export function runCouponChecks(): SelfTestCheck[] {
   const flags = useFeatureFlagsStore.getState().flags
 
   const sample = mockCoupons[0]
+  const offlineStatuses = ['issued', 'used', 'expired', 'canceled'] as const
   const schemaOk =
     !!sample &&
     typeof sample.couponId === 'string' &&
     typeof sample.qrPayload === 'string' &&
     typeof sample.validUntil === 'string' &&
-    ['unused', 'reserved', 'redeemed', 'expired'].includes(sample.status)
+    offlineStatuses.includes(effectiveOfflineCouponStatus(sample))
 
   checks.push(
     check({
@@ -35,41 +48,51 @@ export function runCouponChecks(): SelfTestCheck[] {
       category: 'coupon',
       status: schemaOk ? 'PASS' : 'FAIL',
       message: schemaOk
-        ? 'couponId / qrPayload / validUntil / status OK'
+        ? 'couponId / qrPayload / offline status (issued|used|expired|canceled) OK'
         : 'mock coupon seed invalid',
       durationMs: performance.now() - t0,
     }),
   )
 
-  const payload = buildQrPlaceholderPayload('test-cpn', 'store-test')
-  const qrOk = payload.startsWith('tether-restaurant:mock-coupon:')
+  const payload = buildQrPlaceholderPayload('test-cpn', 'st_gangnam_kimchi')
+  const qrOk = payload.includes('offline-mock-coupon')
   checks.push(
     check({
       id: 'coupon-qr-placeholder',
       name: 'QR placeholder check',
       category: 'coupon',
       status: qrOk ? 'PASS' : 'FAIL',
-      message: qrOk ? 'mock QR payload prefix OK' : 'QR payload format mismatch',
+      message: qrOk ? 'offline mock QR payload OK' : 'QR payload format mismatch',
       durationMs: performance.now() - t0,
     }),
   )
 
   const transitionOk =
-    canTransitionCoupon('unused', 'reserved') &&
-    canTransitionCoupon('reserved', 'redeemed') &&
-    !canTransitionCoupon('redeemed', 'unused')
+    canTransitionOffline('issued', 'used') &&
+    canTransitionOffline('issued', 'canceled') &&
+    !canTransitionOffline('used', 'issued')
   const transitioned = sample
-    ? transitionCouponStatus({ ...sample, status: 'unused' }, 'reserved')
+    ? transitionOfflineCouponStatus({ ...sample, status: 'issued' }, 'used')
     : null
   checks.push(
     check({
       id: 'coupon-status-transition',
-      name: 'Status transition check',
+      name: 'Offline status transition',
       category: 'coupon',
-      status: transitionOk && transitioned ? 'PASS' : 'FAIL',
-      message: transitionOk
-        ? 'unused→reserved→redeemed rules OK'
-        : 'invalid status transition rules',
+      status: transitionOk && transitioned?.status === 'used' ? 'PASS' : 'FAIL',
+      message: transitionOk ? 'issued→used|canceled rules OK' : 'invalid transition rules',
+      durationMs: performance.now() - t0,
+    }),
+  )
+
+  const legacyMigrate = migrateStoredCouponStatus('unused') === 'issued'
+  checks.push(
+    check({
+      id: 'coupon-legacy-migrate',
+      name: 'Legacy status migrate',
+      category: 'coupon',
+      status: legacyMigrate ? 'PASS' : 'FAIL',
+      message: legacyMigrate ? 'unused→issued migrate OK' : 'legacy migrate failed',
       durationMs: performance.now() - t0,
     }),
   )
@@ -87,7 +110,53 @@ export function runCouponChecks(): SelfTestCheck[] {
     }),
   )
 
-  const expiredSample = wallet.find((c) => effectiveCouponStatus(c) === 'expired')
+  const campaignOk = mockEventCampaigns.length > 0 && mockEventCampaigns.every((c) => c.offlineOnly)
+  checks.push(
+    check({
+      id: 'coupon-event-campaign-card',
+      name: 'Event campaign card seed',
+      category: 'coupon',
+      status: campaignOk ? 'PASS' : 'FAIL',
+      message: campaignOk
+        ? `${mockEventCampaigns.length} offline campaigns`
+        : 'event campaign seed missing',
+      durationMs: performance.now() - t0,
+    }),
+  )
+
+  try {
+    savePersistedCouponWallet(wallet.reduce<Record<string, (typeof wallet)[0]>>((acc, c) => {
+      acc[c.couponId] = c
+      return acc
+    }, {}))
+    const reloaded = loadPersistedCouponWallet()
+    const persistOk = !!reloaded && Object.keys(reloaded).length >= mockCoupons.length
+    checks.push(
+      check({
+        id: 'coupon-localstorage',
+        name: 'localStorage persistence',
+        category: 'coupon',
+        status: persistOk ? 'PASS' : 'WARN',
+        message: persistOk
+          ? `key=${getCouponWalletStorageKey()}`
+          : 'persist round-trip unavailable (SSR/test env)',
+        durationMs: performance.now() - t0,
+      }),
+    )
+  } catch {
+    checks.push(
+      check({
+        id: 'coupon-localstorage',
+        name: 'localStorage persistence',
+        category: 'coupon',
+        status: 'WARN',
+        message: 'localStorage write failed',
+        durationMs: performance.now() - t0,
+      }),
+    )
+  }
+
+  const expiredSample = wallet.find((c) => effectiveOfflineCouponStatus(c) === 'expired')
   checks.push(
     check({
       id: 'coupon-expired-effective',
@@ -96,7 +165,7 @@ export function runCouponChecks(): SelfTestCheck[] {
       status: expiredSample ? 'PASS' : 'WARN',
       message: expiredSample
         ? `expired: ${expiredSample.couponId}`
-        : 'no expired coupon in seed (optional)',
+        : 'no expired coupon in seed',
       durationMs: performance.now() - t0,
     }),
   )
@@ -109,7 +178,7 @@ export function runCouponChecks(): SelfTestCheck[] {
       status: flags.mockPaymentsOnly && flags.qrCouponEnabled ? 'PASS' : 'WARN',
       message:
         flags.mockPaymentsOnly && flags.qrCouponEnabled
-          ? 'mockPaymentsOnly + qrCouponEnabled (no real QR payment)'
+          ? 'mock only — no real payment / QR payment / points'
           : 'flags may block coupon demo',
       durationMs: performance.now() - t0,
     }),
@@ -125,6 +194,32 @@ export function runCouponChecks(): SelfTestCheck[] {
       durationMs: performance.now() - t0,
     }),
   )
+
+  const hqSnap = buildHqCouponOpsSnapshot({
+    coupons: wallet,
+    campaigns: mockEventCampaigns,
+    auditEntries: [],
+  })
+  const counts = buildCouponStatusCounts(wallet)
+  const hqOk =
+    hqSnap.dataSource === 'localStorage' &&
+    hqSnap.totalCoupons === wallet.length &&
+    counts.issued + counts.used + counts.expired + counts.canceled === wallet.length
+
+  checks.push(
+    check({
+      id: 'hq-coupon-ops-snapshot',
+      name: 'HQ coupon ops snapshot',
+      category: 'coupon',
+      status: hqOk ? 'PASS' : 'FAIL',
+      message: hqOk
+        ? `HQ panel ready: ${hqSnap.totalCoupons} coupons, ${hqSnap.campaignStats.length} campaigns`
+        : 'HQ ops aggregation mismatch',
+      durationMs: performance.now() - t0,
+    }),
+  )
+
+  checks.push(...runCouponRiskGuardChecks())
 
   return checks
 }

@@ -63,7 +63,7 @@ export function mockIssueCouponFromEventHub(entry: OneAiEventHubEntry): OneAiWin
     bjEventTag: entry.bjTag,
     validFrom,
     validUntil,
-    status: 'unused',
+    status: 'issued',
     qrPayload: buildQrPlaceholderPayload(couponId, entry.storeId),
     discountLabel: entry.prizeLabel,
     saved: false,

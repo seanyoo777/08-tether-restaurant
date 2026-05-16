@@ -4,7 +4,7 @@ export type CheckStatus = 'PASS' | 'WARN' | 'FAIL'
 export type SelfTestCheck = {
   id: string
   name: string
-  category: 'order' | 'cart' | 'flags' | 'routing' | 'smoke' | 'admin' | 'coupon'
+  category: 'order' | 'cart' | 'flags' | 'routing' | 'smoke' | 'admin' | 'coupon' | 'profile'
   status: CheckStatus
   message: string
   durationMs?: number

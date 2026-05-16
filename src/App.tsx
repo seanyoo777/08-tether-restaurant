@@ -30,6 +30,7 @@ import {
   HqStatsPage,
   HqStoresPage,
 } from './pages/hq/hqScreens'
+import { HqCouponOpsPage } from './pages/hq/HqCouponOpsPage'
 import { RiderHomePage } from './pages/rider/RiderHomePage'
 import { StoreAdminHomePage } from './pages/store-admin/StoreAdminHomePage'
 import { StoreMenuManagePage } from './pages/store-admin/StoreMenuManagePage'
@@ -84,6 +85,7 @@ export default function App() {
           <Route path="disputes" element={<HqDisputesPage />} />
           <Route path="reports" element={<HqReportsPage />} />
           <Route path="campaigns" element={<HqCampaignsPage />} />
+          <Route path="coupon-ops" element={<HqCouponOpsPage />} />
           <Route path="notifications" element={<HqNotificationsPage />} />
           <Route path="stats" element={<HqStatsPage />} />
           <Route path="rbac" element={<HqRbacPage />} />

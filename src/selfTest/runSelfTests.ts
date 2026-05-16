@@ -1,6 +1,7 @@
 import { appendAudit } from '../store/auditTrailStore'
 import { runAllSelfTestChecks, runAdminPostActionChecks } from './checks'
-import type { CheckStatus, SelfTestRunSummary } from './types'
+import { runCouponChecks } from './couponChecks'
+import type { CheckStatus, SelfTestCheck, SelfTestRunSummary } from './types'
 
 function overallFromChecks(checks: { status: CheckStatus }[]): CheckStatus {
   if (checks.some((c) => c.status === 'FAIL')) return 'FAIL'
@@ -8,7 +9,7 @@ function overallFromChecks(checks: { status: CheckStatus }[]): CheckStatus {
   return 'PASS'
 }
 
-function summarize(checks: ReturnType<typeof runAllSelfTestChecks>): SelfTestRunSummary {
+export function summarizeChecks(checks: SelfTestCheck[]): SelfTestRunSummary {
   const passCount = checks.filter((c) => c.status === 'PASS').length
   const warnCount = checks.filter((c) => c.status === 'WARN').length
   const failCount = checks.filter((c) => c.status === 'FAIL').length
@@ -33,9 +34,13 @@ export function getLastSelfTestSummary(): SelfTestRunSummary | null {
   return lastSummary
 }
 
+export function runCouponSelfTestSuite(): SelfTestRunSummary {
+  return summarizeChecks(runCouponChecks())
+}
+
 export function runSelfTestSuite(): SelfTestRunSummary {
   const checks = runAllSelfTestChecks()
-  const summary = summarize(checks)
+  const summary = summarizeChecks(checks)
   lastSummary = summary
   appendAudit({
     actor: 'self_test',
@@ -53,7 +58,7 @@ export function validateAfterAdminAction(params: {
   orderId?: string
 }): SelfTestRunSummary {
   const checks = runAdminPostActionChecks(params.orderId)
-  const summary = summarize(checks)
+  const summary = summarizeChecks(checks)
   lastSummary = summary
   appendAudit({
     actor: params.actor,

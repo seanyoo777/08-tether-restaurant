@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite --open",
+    "prebuild": "npm run build --prefix ../packages/global-profile-chip-core && npm run build --prefix ../packages/global-command-palette-core",
     "build": "tsc -b && vite build",
+    "pretest": "npm run build --prefix ../packages/global-profile-chip-core && npm run build --prefix ../packages/global-command-palette-core",
     "lint": "eslint .",
     "test": "vitest run",
     "smoke": "node scripts/smoke.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tetherget/global-profile-chip-core": "file:../packages/global-profile-chip-core",
+    "@tetherget/global-command-palette-core": "file:../packages/global-command-palette-core",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.9.6",

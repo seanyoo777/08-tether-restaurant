@@ -45,6 +45,7 @@
 | `/admin/hq` | 대시보드 |
 | `/admin/hq/members` … `rbac` | 회원·가게·메뉴·주문·결제·정산·수수료·분쟁·신고·캠페인·알림·통계·RBAC (mock 화면) |
 | `/admin/hq/self-test` | Self-Test Center (diagnostics, audit trail, feature flags) |
+| `/admin/hq/coupon-ops` | HQ 쿠폰 운영 (localStorage 지갑·상태 집계·캠페인 통계·coupon audit) |
 
 ## 라이더
 

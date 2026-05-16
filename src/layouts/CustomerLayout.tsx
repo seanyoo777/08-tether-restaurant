@@ -1,5 +1,9 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
+import { GlobalProfileChip } from '../components/profile/GlobalProfileChip'
+import { GlobalCommandButton } from '../components/command/GlobalCommandButton'
+import { GlobalCommandPalette } from '../components/command/GlobalCommandPalette'
+import { useRestaurantCommandShortcut } from '../components/command/useRestaurantCommandShortcut'
 import { useCartStore } from '../store/cartStore'
 
 const tab =
@@ -19,6 +23,7 @@ function TabLink({ to, label, icon }: { to: string; label: string; icon: string 
 }
 
 export function CustomerLayout() {
+  useRestaurantCommandShortcut()
   const location = useLocation()
   const count = useCartStore((s) => s.lines.reduce((n, l) => n + l.qty, 0))
   const hideNav = location.pathname.startsWith('/pay/') || location.pathname.startsWith('/checkout')
@@ -33,6 +38,17 @@ export function CustomerLayout() {
 
   return (
     <div className="mx-auto flex h-full min-h-0 w-full max-w-md flex-col bg-[var(--color-tr-bg)] shadow-xl shadow-black/40">
+      {showNav ? (
+        <div className="flex shrink-0 items-center justify-end gap-2 border-b border-[var(--color-tr-border)] px-3 py-2">
+          <GlobalCommandButton />
+          <span className="hidden sm:inline">
+            <GlobalProfileChip />
+          </span>
+          <span className="sm:hidden">
+            <GlobalProfileChip compact />
+          </span>
+        </div>
+      ) : null}
       <div className="min-h-0 flex-1 overflow-y-auto">
         <Outlet />
       </div>
@@ -65,6 +81,7 @@ export function CustomerLayout() {
           <TabLink to="/me" label="내정보" icon="👤" />
         </nav>
       ) : null}
+      <GlobalCommandPalette />
     </div>
   )
 }
